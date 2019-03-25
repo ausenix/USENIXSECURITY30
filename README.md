@@ -4,7 +4,7 @@ This repository provides essential pieces of the attacks we present in the paper
 
 Below is a description of the folders and files included in this repository:
 
-Folder [Attacks]: The folder including 10 files describing our emulated attacks (M-1 to M-6 for multi-host and S-1 to S-4 for single-host). Each file give detailed description about how the attack takes place step by step.
+Folder [Attacks]: The folder including 10 files describing our emulated attacks (M-1 to M-6 for multi-host and S-1 to S-4 for single-host). Each file gives detailed description about how the attack takes place step by step.
 
 Folder [exfiltration_server]: Source code for the exfiltration server.
 
